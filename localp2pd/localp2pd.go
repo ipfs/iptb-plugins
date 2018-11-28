@@ -1,7 +1,6 @@
 package pluginlocalp2pd
 
 import (
-	// "context"
 	"context"
 	"errors"
 	"fmt"
@@ -10,12 +9,10 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"strconv"
 	"sync"
 	"syscall"
 	"time"
-
-	// "io"
-	"strconv"
 
 	"github.com/ipfs/iptb/testbed/interfaces"
 	client "github.com/libp2p/go-libp2p-daemon/p2pclient"

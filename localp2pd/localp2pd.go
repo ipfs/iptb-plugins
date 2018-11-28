@@ -20,8 +20,11 @@ import (
 	ma "github.com/multiformats/go-multiaddr"
 )
 
-// PluginName is the libp2p daemon IPTB plugin name.
-var PluginName = "localp2pd"
+const (
+	// PluginName is the libp2p daemon IPTB plugin name.
+	PluginName = "localp2pd"
+	attrID     = "id"
+)
 
 // type check
 var _ testbedi.Core = (*LocalP2pd)(nil)
@@ -55,8 +58,7 @@ type LocalP2pd struct {
 // local system using control sockets within the specified directory.
 // Attributes:
 // - controladdr:
-// func NewNode(dir string, attrs map[string]string) (testbedi.Core, error) {
-func NewNode(dir string, attrs map[string]string) (*LocalP2pd, error) {
+func NewNode(dir string, attrs map[string]string) (testbedi.Core, error) {
 	// defaults
 	var (
 		connManager    *connManagerConfig
@@ -397,4 +399,17 @@ func (l *LocalP2pd) String() string {
 		return fmt.Sprintf("%s", l.Type())
 	}
 	return fmt.Sprintf("%s{%s}", l.Type(), pcid[0:12])
+}
+
+func GetAttrList() []string {
+	return []string{attrID}
+}
+
+func GetAttrDesc(attr string) (string, error) {
+	switch attr {
+	case attrID:
+		return "node ID", nil
+	default:
+		return "", errors.New("unrecognized attribute")
+	}
 }

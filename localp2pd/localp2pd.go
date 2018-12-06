@@ -10,6 +10,7 @@ import (
 	"os/exec"
 	"path/filepath"
 	"strconv"
+	"strings"
 	"syscall"
 	"time"
 
@@ -408,26 +409,69 @@ func (l *LocalP2pd) String() string {
 	return fmt.Sprintf("%s{%s}", l.Type(), pcid[0:12])
 }
 
-func GetAttrList() []string {
-	return nil
+var attrDesc = map[string]string{
+	"id":             "the peer id (base58 encoded)",
+	"addresses":      "comma-separated list of multiaddrs peer is listening on(as strings)",
+	"controladdress": "the address the daemon is listening on",
 }
 
-func GetAttrDesc(string) (string, error) {
-	return "", fmt.Errorf("the libp2p daemon does not expose any attributes")
+func GetAttrList() []string {
+	attrs := make([]string, 0, len(attrDesc))
+	for attr := range attrDesc {
+		attrs = append(attrs, attr)
+	}
+	return attrs
+}
+
+func GetAttrDesc(attr string) (string, error) {
+	desc, ok := attrDesc[attr]
+	if !ok {
+		return "", fmt.Errorf("the libp2p daemon does not expose an attribute named \"%s\"", attr)
+	}
+	return desc, nil
 }
 
 func (l *LocalP2pd) GetAttrList() []string {
 	return GetAttrList()
 }
 
-func (l *LocalP2pd) GetAttrDesc(string) (string, error) {
-	return GetAttrDesc("")
+func (l *LocalP2pd) GetAttrDesc(attr string) (string, error) {
+	return GetAttrDesc(attr)
 }
 
-func (l *LocalP2pd) Attr(string) (string, error) {
-	return "", fmt.Errorf("the libp2p daemon does not expose any attributes")
+func (l *LocalP2pd) peerAddresses() ([]string, error) {
+	client, err := l.newClient()
+	if err != nil {
+		return nil, err
+	}
+	defer client.Close()
+	_, addrs, err := client.Identify()
+	if err != nil {
+		return nil, err
+	}
+	addrstrs := make([]string, len(addrs))
+	for i, addr := range addrs {
+		addrstrs[i] = addr.String()
+	}
+	return addrstrs, nil
+}
+
+func (l *LocalP2pd) Attr(attr string) (string, error) {
+	switch attr {
+	case "id":
+		return l.PeerID()
+	case "addresses":
+		addrs, err := l.peerAddresses()
+		if err != nil {
+			return "", err
+		}
+		return strings.Join(addrs, ","), nil
+	case "controladdress":
+		return l.APIAddr()
+	}
+	return "", fmt.Errorf("the libp2p daemon does not expose an attribute named \"%s\"", attr)
 }
 
 func (l *LocalP2pd) SetAttr(string, string) error {
-	return fmt.Errorf("the libp2p daemon does not expose any attributes")
+	return fmt.Errorf("the libp2p daemon does not expose any writeable attributes")
 }

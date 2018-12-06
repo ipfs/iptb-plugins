@@ -365,7 +365,6 @@ func (l *LocalP2pd) Connect(ctx context.Context, n testbedi.Core) error {
 		return err
 	}
 	for _, addrstr := range addrstrs {
-		fmt.Println("trying", addrstr)
 		addr, err := ma.NewMultiaddr(addrstr)
 		// log?
 		if err != nil {

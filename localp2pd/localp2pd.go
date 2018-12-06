@@ -23,11 +23,14 @@ import (
 const (
 	// PluginName is the libp2p daemon IPTB plugin name.
 	PluginName = "localp2pd"
-	attrID     = "id"
 )
 
 // type check
-var _ testbedi.Core = (*LocalP2pd)(nil)
+var _ testbedi.Attribute = (*LocalP2pd)(nil)
+var _ testbedi.Libp2p = (*LocalP2pd)(nil)
+
+// var _ testbedi.Config = (*LocalP2pd)(nil)
+// var _ testbedi.Metric = (*LocalP2pd)(nil)
 
 type connManagerConfig struct {
 	lowWatermark  *int
@@ -402,14 +405,25 @@ func (l *LocalP2pd) String() string {
 }
 
 func GetAttrList() []string {
-	return []string{attrID}
+	return nil
 }
 
-func GetAttrDesc(attr string) (string, error) {
-	switch attr {
-	case attrID:
-		return "node ID", nil
-	default:
-		return "", errors.New("unrecognized attribute")
-	}
+func GetAttrDesc(string) (string, error) {
+	return "", fmt.Errorf("the libp2p daemon does not expose any attributes")
+}
+
+func (l *LocalP2pd) GetAttrList() []string {
+	return GetAttrList()
+}
+
+func (l *LocalP2pd) GetAttrDesc(string) (string, error) {
+	return GetAttrDesc("")
+}
+
+func (l *LocalP2pd) Attr(string) (string, error) {
+	return "", fmt.Errorf("the libp2p daemon does not expose any attributes")
+}
+
+func (l *LocalP2pd) SetAttr(string, string) error {
+	return fmt.Errorf("the libp2p daemon does not expose any attributes")
 }

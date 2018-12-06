@@ -70,8 +70,24 @@ func NewNode(dir string, attrs map[string]string) (testbedi.Core, error) {
 		err            error
 		bootstrapPeers string
 		command        string
+		process        *os.Process
 		bootstrap      = false
 	)
+
+	pidpath := filepath.Join(dir, "p2pd.pid")
+	pidbytes, err := ioutil.ReadFile(pidpath)
+	if err != nil && !os.IsNotExist(err) {
+		return nil, err
+	}
+	pid, err := strconv.Atoi(string(pidbytes))
+	if err != nil {
+		os.Remove(pidpath)
+	} else {
+		process, err = os.FindProcess(pid)
+		if err != nil {
+			return nil, err
+		}
+	}
 
 	if dhtMode, found = attrs["dhtmode"]; !found {
 		dhtMode = "off"
@@ -123,7 +139,7 @@ func NewNode(dir string, attrs map[string]string) (testbedi.Core, error) {
 	}
 
 	if command, found = attrs["command"]; !found {
-		command = ""
+		command = "p2pd"
 	}
 
 	p2pd := &LocalP2pd{
@@ -133,7 +149,7 @@ func NewNode(dir string, attrs map[string]string) (testbedi.Core, error) {
 		connManager:    connManager,
 		bootstrap:      bootstrap,
 		bootstrapPeers: bootstrapPeers,
-		alive:          false,
+		process:        process,
 	}
 	return p2pd, nil
 }
@@ -175,8 +191,8 @@ func (l *LocalP2pd) cmdArgs() []string {
 			args = append(args, "-connLo", strconv.Itoa(*l.connManager.lowWatermark))
 		}
 
-		args = append(args, "-sock", l.sockPath())
 	}
+	args = append(args, "-sock", l.sockPath())
 
 	return args
 }
@@ -252,8 +268,7 @@ func (l *LocalP2pd) Start(ctx context.Context, wait bool, args ...string) (testb
 		return nil, err
 	}
 
-	l.process = cmd.Process
-	pid := l.process.Pid
+	pid := cmd.Process.Pid
 
 	err = ioutil.WriteFile(filepath.Join(l.dir, "p2pd.pid"), []byte(fmt.Sprint(pid)), 0666)
 	if err != nil {
@@ -288,6 +303,9 @@ func (l *LocalP2pd) Stop(ctx context.Context) error {
 	l.mclient.Unlock()
 
 	proc := l.process
+	if proc == nil {
+		return nil
+	}
 
 	waitch := make(chan struct{}, 1)
 	go func() {
@@ -298,6 +316,7 @@ func (l *LocalP2pd) Stop(ctx context.Context) error {
 	// cleanup
 	defer func() {
 		os.Remove(filepath.Join(l.dir, "p2pd.pid"))
+		os.Remove(filepath.Join(l.dir, "p2pd.sock"))
 	}()
 
 	for i := 0; i < 2; i++ {

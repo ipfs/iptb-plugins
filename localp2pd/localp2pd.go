@@ -10,7 +10,6 @@ import (
 	"os/exec"
 	"path/filepath"
 	"strconv"
-	"sync"
 	"syscall"
 	"time"
 
@@ -51,10 +50,6 @@ type LocalP2pd struct {
 	// process
 	process *os.Process
 	alive   bool
-
-	// client
-	mclient sync.Mutex
-	client  *client.Client
 }
 
 // NewNode creates a localp2pd iptb core node that runs the libp2p daemon on the
@@ -199,16 +194,16 @@ func (l *LocalP2pd) cmdArgs() []string {
 
 // PeerID returns the peer id
 func (l *LocalP2pd) PeerID() (string, error) {
-	client, releaseClient, err := l.acquireClient()
-	defer releaseClient()
+	client, err := l.newClient()
 	if err != nil {
 		return "", err
 	}
+	defer client.Close()
 	peerID, _, err := client.Identify()
 	if err != nil {
 		return "", err
 	}
-	return peerID.String(), nil
+	return peerID.Pretty(), nil
 }
 
 // APIAddr returns the multiaddr for the api
@@ -218,11 +213,11 @@ func (l *LocalP2pd) APIAddr() (string, error) {
 
 // SwarmAddrs returns the swarm addrs for the node
 func (l *LocalP2pd) SwarmAddrs() ([]string, error) {
-	client, releaseClient, err := l.acquireClient()
-	defer releaseClient()
+	client, err := l.newClient()
 	if err != nil {
 		return nil, err
 	}
+	defer client.Close()
 	_, addrs, err := client.Identify()
 	if err != nil {
 		return nil, err
@@ -293,15 +288,6 @@ func (l *LocalP2pd) Start(ctx context.Context, wait bool, args ...string) (testb
 // Stop shuts down the daemon
 func (l *LocalP2pd) Stop(ctx context.Context) error {
 	// Stop a client if it exists
-	l.mclient.Lock()
-	if l.client != nil {
-		if err := l.client.Close(); err != nil {
-			return err
-		}
-		l.client = nil
-	}
-	l.mclient.Unlock()
-
 	proc := l.process
 	if proc == nil {
 		return nil
@@ -358,17 +344,20 @@ func (l *LocalP2pd) RunCmd(ctx context.Context, stdin io.Reader, args ...string)
 
 // Connect the node to another
 func (l *LocalP2pd) Connect(ctx context.Context, n testbedi.Core) error {
-	client, releaseClient, err := l.acquireClient()
-	defer releaseClient()
+	client, err := l.newClient()
 	if err != nil {
 		return err
 	}
+	defer client.Close()
 
 	peerstr, err := n.PeerID()
 	if err != nil {
 		return err
 	}
-	peer := peer.ID(peerstr)
+	peer, err := peer.IDB58Decode(peerstr)
+	if err != nil {
+		return err
+	}
 
 	var addrs []ma.Multiaddr
 	addrstrs, err := n.SwarmAddrs()
@@ -376,6 +365,7 @@ func (l *LocalP2pd) Connect(ctx context.Context, n testbedi.Core) error {
 		return err
 	}
 	for _, addrstr := range addrstrs {
+		fmt.Println("trying", addrstr)
 		addr, err := ma.NewMultiaddr(addrstr)
 		// log?
 		if err != nil {
@@ -387,16 +377,12 @@ func (l *LocalP2pd) Connect(ctx context.Context, n testbedi.Core) error {
 	return client.Connect(peer, addrs)
 }
 
-func (l *LocalP2pd) acquireClient() (*client.Client, func(), error) {
-	l.mclient.Lock()
-	if l.client == nil {
-		client, err := client.NewClient(l.sockPath(), filepath.Join(l.dir, "p2pclient.sock"))
-		if err != nil {
-			return nil, nil, err
-		}
-		l.client = client
+func (l *LocalP2pd) newClient() (*client.Client, error) {
+	client, err := client.NewClient(l.sockPath(), filepath.Join(l.dir, "p2pclient.sock"))
+	if err != nil {
+		return nil, err
 	}
-	return l.client, l.mclient.Unlock, nil
+	return client, nil
 }
 
 // Shell is a no-op for the libp2p daemon.

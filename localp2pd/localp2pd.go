@@ -398,7 +398,7 @@ func (l *LocalP2pd) Dir() string {
 // Type returns a string that identifies the implementation
 // Examples localipfs, dockeripfs, etc.
 func (l *LocalP2pd) Type() string {
-	return "localp2pd"
+	return PluginName
 }
 
 func (l *LocalP2pd) String() string {

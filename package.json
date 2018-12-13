@@ -54,6 +54,11 @@
       "hash": "QmckeQ2zrYLAXoSHYTGn5BDdb22BqbUoHEHm8KZ9YWRxd1",
       "name": "iptb",
       "version": "2.0.0"
+    },
+    {
+      "hash": "QmfAnXaGKER9YKgkYN8th7zdSY1fcPGnzAtrxKcunxqy6t",
+      "name": "go-libp2p-daemon",
+      "version": "0.0.1"
     }
   ],
   "gxVersion": "0.6.0",

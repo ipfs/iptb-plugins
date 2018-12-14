@@ -39,9 +39,9 @@
     },
     {
       "author": "magik6k",
-      "hash": "QmYyzmMnhNTtoXx5ttgUaRdHHckYnQWjPL98hgLAR2QLDD",
+      "hash": "QmcZfkbgwwwH5ZLTQRHkSQBDiDqd3skY2eU6MZRgWuXcse",
       "name": "go-ipfs-config",
-      "version": "0.2.21"
+      "version": "0.2.22"
     },
     {
       "author": "whyrusleeping",
@@ -56,9 +56,9 @@
       "version": "2.0.0"
     },
     {
-      "hash": "QmfAnXaGKER9YKgkYN8th7zdSY1fcPGnzAtrxKcunxqy6t",
+      "hash": "QmU45roygPSFdwDAgsGXtAKfJbptkjo9sW2q1bjohSEhEB",
       "name": "go-libp2p-daemon",
-      "version": "0.0.1"
+      "version": "0.0.2"
     }
   ],
   "gxVersion": "0.6.0",
@@ -67,6 +67,6 @@
   "license": "",
   "name": "iptb-plugins",
   "releaseCmd": "git commit -a -m \"gx publish $VERSION\"",
-  "version": "1.0.6"
+  "version": "1.0.7"
 }
 

@@ -56,9 +56,9 @@
       "version": "2.0.0"
     },
     {
-      "hash": "QmVJGiTiF5eSm5JFmtEsNy1uNqB7WqVqZH6BPuZzmRRGo2",
+      "hash": "QmWK5KBqC7GeFhVV9H3mfv71UyofiHUvbdAe1gQ6TUEwuq",
       "name": "go-libp2p-daemon",
-      "version": "0.0.12"
+      "version": "0.0.13"
     }
   ],
   "gxVersion": "0.6.0",
@@ -67,6 +67,6 @@
   "license": "",
   "name": "iptb-plugins",
   "releaseCmd": "git commit -a -m \"gx publish $VERSION\"",
-  "version": "1.0.15"
+  "version": "1.0.16"
 }
 

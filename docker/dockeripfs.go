@@ -171,12 +171,7 @@ func (l *DockerIpfs) Init(ctx context.Context, args ...string) (testbedi.Output,
 }
 
 func (l *DockerIpfs) Start(ctx context.Context, wait bool, args ...string) (testbedi.Output, error) {
-	alive, err := l.isAlive()
-	if err != nil {
-		return nil, err
-	}
-
-	if alive {
+	if l.IsAlive() {
 		return nil, fmt.Errorf("node is already running")
 	}
 
@@ -464,6 +459,10 @@ func (l *DockerIpfs) Type() string {
 	return "ipfs"
 }
 
+func (l *DockerIpfs) IsAlive() bool {
+	return ipfs.APIReachable(l)
+}
+
 func (l *DockerIpfs) Deployment() string {
 	return "docker"
 }
@@ -479,10 +478,6 @@ func (l *DockerIpfs) getID() (string, error) {
 	}
 
 	return string(b), nil
-}
-
-func (l *DockerIpfs) isAlive() (bool, error) {
-	return false, nil
 }
 
 func (l *DockerIpfs) env() ([]string, error) {

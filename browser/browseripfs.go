@@ -357,6 +357,10 @@ func (l *BrowserIpfs) Type() string {
 	return PluginName
 }
 
+func (l *BrowserIpfs) IsAlive() bool {
+	return ipfs.APIReachable(l)
+}
+
 func (l *BrowserIpfs) signalAndWait(p *os.Process, waitch <-chan struct{}, signal os.Signal, t time.Duration) error {
 	if err := p.Signal(signal); err != nil {
 		return errors.Wrapf(err, "error killing daemon %s", l.dir)

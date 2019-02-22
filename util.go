@@ -221,6 +221,10 @@ func SwarmAddrs(l testbedi.Core) ([]string, error) {
 	return maddrs, nil
 }
 
+func APIReachable(l testbedi.Libp2p) bool {
+	return tryAPICheck(l) == nil
+}
+
 func WaitOnAPI(l testbedi.Libp2p) error {
 	for i := 0; i < 50; i++ {
 		err := tryAPICheck(l)

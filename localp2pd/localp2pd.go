@@ -50,7 +50,6 @@ type LocalP2pd struct {
 
 	// process
 	process *os.Process
-	alive   bool
 }
 
 // NewNode creates a localp2pd iptb core node that runs the libp2p daemon on the
@@ -237,7 +236,7 @@ func (l *LocalP2pd) Init(ctx context.Context, args ...string) (testbedi.Output, 
 
 // Start launches a libp2p daemon
 func (l *LocalP2pd) Start(ctx context.Context, wait bool, args ...string) (testbedi.Output, error) {
-	if l.alive {
+	if l.IsAlive() {
 		return nil, fmt.Errorf("libp2p daemon is already running")
 	}
 
@@ -407,6 +406,11 @@ func (l *LocalP2pd) Dir() string {
 // Examples localipfs, dockeripfs, etc.
 func (l *LocalP2pd) Type() string {
 	return PluginName
+}
+
+// IsAlive returns true if the node is running and false otherwise
+func (l *LocalP2pd) IsAlive() bool {
+	return ipfs.APIReachable(l)
 }
 
 func (l *LocalP2pd) String() string {

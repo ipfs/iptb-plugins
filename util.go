@@ -259,10 +259,12 @@ func tryAPICheck(l testbedi.Libp2p) error {
 		return err
 	}
 
-	resp, err := http.Get(fmt.Sprintf("http://%s:%s/api/v0/id", ip, pt))
+	httpc := &http.Client{Timeout: 200 * time.Millisecond}
+	resp, err := httpc.Get(fmt.Sprintf("http://%s:%s/api/v0/id", ip, pt))
 	if err != nil {
 		return err
 	}
+	defer resp.Body.Close()
 
 	out := make(map[string]interface{})
 	err = json.NewDecoder(resp.Body).Decode(&out)

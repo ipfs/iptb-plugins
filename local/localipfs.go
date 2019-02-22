@@ -456,6 +456,11 @@ func (l *LocalIpfs) Type() string {
 	return "ipfs"
 }
 
+func (l *LocalIpfs) IsAlive() bool {
+	alive, _ := l.isAlive()
+	return alive
+}
+
 func (l *LocalIpfs) Deployment() string {
 	return "local"
 }

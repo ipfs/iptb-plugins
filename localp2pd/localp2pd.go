@@ -15,8 +15,8 @@ import (
 	"time"
 
 	"github.com/ipfs/iptb/testbed/interfaces"
+	peer "github.com/libp2p/go-libp2p-core/peer"
 	client "github.com/libp2p/go-libp2p-daemon/p2pclient"
-	peer "github.com/libp2p/go-libp2p-peer"
 	ma "github.com/multiformats/go-multiaddr"
 )
 

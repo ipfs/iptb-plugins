@@ -13,7 +13,6 @@ import (
 
 	"github.com/ipfs/go-cid"
 	config "github.com/ipfs/go-ipfs-config"
-	_ "github.com/libp2p/go-libp2p"
 	"github.com/multiformats/go-multiaddr"
 	"github.com/pkg/errors"
 

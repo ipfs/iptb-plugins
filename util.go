@@ -16,7 +16,7 @@ import (
 	"github.com/multiformats/go-multiaddr"
 	"github.com/pkg/errors"
 
-	"github.com/ipfs/iptb/testbed/interfaces"
+	testbedi "github.com/ipfs/iptb/testbed/interfaces"
 )
 
 const (
@@ -135,7 +135,7 @@ func ReadLogs(l testbedi.Libp2p) (io.ReadCloser, error) {
 		return nil, err
 	}
 
-	resp, err := http.Get(fmt.Sprintf("http://%s:%s/api/v0/log/tail", ip, pt))
+	resp, err := http.Post(fmt.Sprintf("http://%s:%s/api/v0/log/tail", ip, pt), "", nil)
 	if err != nil {
 		return nil, err
 	}
@@ -169,7 +169,7 @@ func GetBW(l testbedi.Libp2p) (*BW, error) {
 		return nil, err
 	}
 
-	resp, err := http.Get(fmt.Sprintf("http://%s:%s/api/v0/stats/bw", ip, pt))
+	resp, err := http.Post(fmt.Sprintf("http://%s:%s/api/v0/stats/bw", ip, pt), "", nil)
 	if err != nil {
 		return nil, err
 	}
@@ -258,7 +258,7 @@ func tryAPICheck(l testbedi.Libp2p) error {
 		return err
 	}
 
-	resp, err := http.Get(fmt.Sprintf("http://%s:%s/api/v0/id", ip, pt))
+	resp, err := http.Post(fmt.Sprintf("http://%s:%s/api/v0/id", ip, pt), "", nil)
 	if err != nil {
 		return err
 	}

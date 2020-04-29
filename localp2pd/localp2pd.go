@@ -14,7 +14,7 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/ipfs/iptb/testbed/interfaces"
+	testbedi "github.com/ipfs/iptb/testbed/interfaces"
 	peer "github.com/libp2p/go-libp2p-core/peer"
 	client "github.com/libp2p/go-libp2p-daemon/p2pclient"
 	ma "github.com/multiformats/go-multiaddr"
@@ -355,7 +355,7 @@ func (l *LocalP2pd) Connect(ctx context.Context, n testbedi.Core) error {
 	if err != nil {
 		return err
 	}
-	peer, err := peer.IDB58Decode(peerstr)
+	peer, err := peer.Decode(peerstr)
 	if err != nil {
 		return err
 	}

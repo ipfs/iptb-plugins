@@ -3,6 +3,7 @@ package plugindockeripfs
 import (
 	"bytes"
 	"context"
+	"encoding/json"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -43,6 +44,7 @@ type DockerIpfs struct {
 	apiaddr     multiaddr.Multiaddr
 	swarmaddr   multiaddr.Multiaddr
 	mdns        bool
+	apiIP4      string
 }
 
 func NewNode(dir string, attrs map[string]string) (testbedi.Core, error) {
@@ -356,7 +358,56 @@ func (l *DockerIpfs) String() string {
 }
 
 func (l *DockerIpfs) APIAddr() (string, error) {
-	return ipfs.GetAPIAddrFromRepo(l.dir)
+	if l.apiIP4 != "" {
+		return l.apiIP4, nil
+	}
+
+	cmd := exec.Command("docker", "inspect", l.id)
+
+	var outbuf, errbuf bytes.Buffer
+	cmd.Stdout = &outbuf
+	cmd.Stderr = &errbuf
+
+	err := cmd.Run()
+	if err != nil {
+		return "", fmt.Errorf("error running cmd: %s", err)
+	}
+
+	var data []map[string]interface{}
+	err = json.Unmarshal(outbuf.Bytes(), &data)
+	if err != nil {
+		fmt.Println(err)
+		return "", fmt.Errorf("error unmarshalling cmd output: %s", err)
+	}
+
+	jsonObj := data[0]["NetworkSettings"]
+	fields := [3]string{"Networks", "bridge", "IPAddress"}
+	for _, field := range fields {
+		var ok bool
+		jsonObj, ok = jsonObj.(map[string]interface{})[field]
+		if !ok {
+			return "", fmt.Errorf("error accessing %s json field from %v", field, jsonObj)
+		}
+	}
+
+	ip4, ok := jsonObj.(string)
+	if !ok {
+		return "", fmt.Errorf("error casting json result to string: %s", err)
+	}
+	apiaddr, err := multiaddr.NewMultiaddr(fmt.Sprintf("/ip4/%s/tcp/5001", ip4))
+	if err != nil {
+		return "", fmt.Errorf("error converting to multiaddr: %s", err)
+	}
+	swarmaddr, err := multiaddr.NewMultiaddr(fmt.Sprintf("/ip4/%s/tcp/4001", ip4))
+	if err != nil {
+		return "", err
+	}
+
+	l.apiIP4 = fmt.Sprintf("/ip4/%s/tcp/5001", ip4)
+	l.apiaddr = apiaddr
+	l.swarmaddr = swarmaddr
+
+	return l.apiIP4, nil
 }
 
 func (l *DockerIpfs) SwarmAddrs() ([]string, error) {

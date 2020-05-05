@@ -30,8 +30,12 @@ var ErrTimeout = errors.New("timeout")
 var PluginName = "dockeripfs"
 
 const (
-	attrIfName    = "ifname"
-	attrContainer = "container"
+	attrIfName     = "ifname"
+	attrContainer  = "container"
+	attrLatency    = "latency"
+	attrBandwidth  = "bandwidth"
+	attrJitter     = "jitter"
+	attrPacketLoss = "loss"
 )
 
 type DockerIpfs struct {
@@ -109,7 +113,15 @@ func NewNode(dir string, attrs map[string]string) (testbedi.Core, error) {
 }
 
 func GetAttrList() []string {
-	return append(ipfs.GetAttrList(), attrIfName, attrContainer)
+	return append(
+		ipfs.GetAttrList(),
+		attrIfName,
+		attrContainer,
+		attrLatency,
+		attrBandwidth,
+		attrJitter,
+		attrPacketLoss,
+	)
 }
 
 func GetAttrDesc(attr string) (string, error) {
@@ -118,6 +130,14 @@ func GetAttrDesc(attr string) (string, error) {
 		return "docker ifname", nil
 	case attrContainer:
 		return "docker container id", nil
+	case attrLatency:
+		return "link latency", nil
+	case attrBandwidth:
+		return "link bandwidth", nil
+	case attrJitter:
+		return "link jitter", nil
+	case attrPacketLoss:
+		return "link packet loss", nil
 	}
 
 	return ipfs.GetAttrDesc(attr)
@@ -431,13 +451,13 @@ func (l *DockerIpfs) Attr(attr string) (string, error) {
 
 func (l *DockerIpfs) SetAttr(attr string, val string) error {
 	switch attr {
-	case "latency":
+	case attrLatency:
 		return l.setLatency(val)
-	case "bandwidth":
+	case attrBandwidth:
 		return l.setBandwidth(val)
-	case "jitter":
+	case attrJitter:
 		return l.setJitter(val)
-	case "loss":
+	case attrPacketLoss:
 		return l.setPacketLoss(val)
 	default:
 		return fmt.Errorf("no attribute named: %s", attr)

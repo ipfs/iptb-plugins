@@ -13,13 +13,12 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/ipfs/iptb-plugins"
-	"github.com/ipfs/iptb/testbed/interfaces"
-	"github.com/ipfs/iptb/util"
+	ipfs "github.com/ipfs/iptb-plugins"
+	iptbutil "github.com/ipfs/iptb/util"
 
-	"github.com/ipfs/go-cid"
 	config "github.com/ipfs/go-ipfs-config"
 	serial "github.com/ipfs/go-ipfs-config/serialize"
+	testbedi "github.com/ipfs/iptb/testbed/interfaces"
 	"github.com/multiformats/go-multiaddr"
 	"github.com/pkg/errors"
 )
@@ -30,7 +29,7 @@ var PluginName = "localipfs"
 
 type LocalIpfs struct {
 	dir       string
-	peerid    *cid.Cid
+	peerid    string
 	apiaddr   multiaddr.Multiaddr
 	swarmaddr multiaddr.Multiaddr
 	binary    string
@@ -378,18 +377,18 @@ func (l *LocalIpfs) Dir() string {
 }
 
 func (l *LocalIpfs) PeerID() (string, error) {
-	if l.peerid != nil {
-		return l.peerid.String(), nil
+	if l.peerid != "" {
+		return l.peerid, nil
 	}
 
 	var err error
-	l.peerid, err = ipfs.GetPeerID(l)
+	l.peerid, err = ipfs.GetPeerIDString(l)
 
 	if err != nil {
 		return "", err
 	}
 
-	return l.peerid.String(), nil
+	return l.peerid, nil
 }
 
 /// Metric Interface

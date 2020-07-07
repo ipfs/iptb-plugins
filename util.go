@@ -65,25 +65,6 @@ func GetMetric(l testbedi.Core, metric string) (string, error) {
 	}
 }
 
-// func GetPeerID(l testbedi.Config) (*cid.Cid, error) {
-// 	icfg, err := l.Config()
-// 	if err != nil {
-// 		return nil, err
-// 	}
-
-// 	lcfg, ok := icfg.(*config.Config)
-// 	if !ok {
-// 		return nil, fmt.Errorf("Error: GetConfig() is not an ipfs config")
-// 	}
-
-// 	pcid, err := cid.Decode(lcfg.Identity.PeerID)
-// 	if err != nil {
-// 		return nil, err
-// 	}
-
-// 	return &pcid, nil
-// }
-
 func GetPeerID(l testbedi.Config) (peer.ID, error) {
 	icfg, err := l.Config()
 	if err != nil {

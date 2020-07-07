@@ -13,11 +13,11 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/ipfs/iptb-plugins"
-	"github.com/ipfs/iptb/testbed/interfaces"
-	"github.com/ipfs/iptb/util"
+	ipfs "github.com/ipfs/iptb-plugins"
+	testbedi "github.com/ipfs/iptb/testbed/interfaces"
+	iptbutil "github.com/ipfs/iptb/util"
+	peer "github.com/libp2p/go-libp2p-core/peer"
 
-	"github.com/ipfs/go-cid"
 	config "github.com/ipfs/go-ipfs-config"
 	serial "github.com/ipfs/go-ipfs-config/serialize"
 	"github.com/pkg/errors"
@@ -29,7 +29,7 @@ var PluginName = "browseripfs"
 
 type BrowserIpfs struct {
 	dir         string
-	peerid      *cid.Cid
+	peerid      peer.ID
 	repobuilder string
 	apiaddr     string
 	swarmaddr   string
@@ -331,7 +331,7 @@ func (l *BrowserIpfs) Dir() string {
 }
 
 func (l *BrowserIpfs) PeerID() (string, error) {
-	if l.peerid != nil {
+	if l.peerid.Validate() == nil {
 		return l.peerid.String(), nil
 	}
 

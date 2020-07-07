@@ -13,7 +13,7 @@ import (
 	"syscall"
 	"time"
 
-	ipfs "github.com/ipfs/iptb-plugins"
+	iptbplugins "github.com/ipfs/iptb-plugins"
 	iptbutil "github.com/ipfs/iptb/util"
 
 	config "github.com/ipfs/go-ipfs-config"
@@ -101,19 +101,19 @@ func NewNode(dir string, attrs map[string]string) (testbedi.Core, error) {
 }
 
 func GetAttrList() []string {
-	return ipfs.GetAttrList()
+	return iptbplugins.GetAttrList()
 }
 
 func GetAttrDesc(attr string) (string, error) {
-	return ipfs.GetAttrDesc(attr)
+	return iptbplugins.GetAttrDesc(attr)
 }
 
 func GetMetricList() []string {
-	return ipfs.GetMetricList()
+	return iptbplugins.GetMetricList()
 }
 
 func GetMetricDesc(attr string) (string, error) {
-	return ipfs.GetMetricDesc(attr)
+	return iptbplugins.GetMetricDesc(attr)
 }
 
 /// TestbedNode Interface
@@ -194,7 +194,7 @@ func (l *LocalIpfs) Start(ctx context.Context, wait bool, args ...string) (testb
 	}
 
 	if wait {
-		return nil, ipfs.WaitOnAPI(l)
+		return nil, iptbplugins.WaitOnAPI(l)
 	}
 
 	return nil, nil
@@ -366,11 +366,11 @@ func (l *LocalIpfs) String() string {
 }
 
 func (l *LocalIpfs) APIAddr() (string, error) {
-	return ipfs.GetAPIAddrFromRepo(l.dir)
+	return iptbplugins.GetAPIAddrFromRepo(l.dir)
 }
 
 func (l *LocalIpfs) SwarmAddrs() ([]string, error) {
-	return ipfs.SwarmAddrs(l)
+	return iptbplugins.SwarmAddrs(l)
 }
 
 func (l *LocalIpfs) Dir() string {
@@ -383,7 +383,7 @@ func (l *LocalIpfs) PeerID() (string, error) {
 	}
 
 	var err error
-	l.peerid, err = ipfs.GetPeerID(l)
+	l.peerid, err = iptbplugins.GetPeerID(l)
 
 	if err != nil {
 		return "", err
@@ -403,7 +403,7 @@ func (l *LocalIpfs) GetMetricDesc(attr string) (string, error) {
 }
 
 func (l *LocalIpfs) Metric(metric string) (string, error) {
-	return ipfs.GetMetric(l, metric)
+	return iptbplugins.GetMetric(l, metric)
 }
 
 func (l *LocalIpfs) Heartbeat() (map[string]string, error) {
@@ -411,7 +411,7 @@ func (l *LocalIpfs) Heartbeat() (map[string]string, error) {
 }
 
 func (l *LocalIpfs) Events() (io.ReadCloser, error) {
-	return ipfs.ReadLogs(l)
+	return iptbplugins.ReadLogs(l)
 }
 
 func (l *LocalIpfs) Logs() (io.ReadCloser, error) {
@@ -429,7 +429,7 @@ func (l *LocalIpfs) GetAttrDesc(attr string) (string, error) {
 }
 
 func (l *LocalIpfs) Attr(attr string) (string, error) {
-	return ipfs.GetAttr(l, attr)
+	return iptbplugins.GetAttr(l, attr)
 }
 
 func (l *LocalIpfs) SetAttr(string, string) error {

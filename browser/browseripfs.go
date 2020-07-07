@@ -13,7 +13,7 @@ import (
 	"syscall"
 	"time"
 
-	ipfs "github.com/ipfs/iptb-plugins"
+	iptbplugins "github.com/ipfs/iptb-plugins"
 	testbedi "github.com/ipfs/iptb/testbed/interfaces"
 	iptbutil "github.com/ipfs/iptb/util"
 	peer "github.com/libp2p/go-libp2p-core/peer"
@@ -158,7 +158,7 @@ func (l *BrowserIpfs) Start(ctx context.Context, wait bool, args ...string) (tes
 	}
 
 	if wait {
-		return nil, ipfs.WaitOnAPI(l)
+		return nil, iptbplugins.WaitOnAPI(l)
 	}
 
 	return nil, nil
@@ -319,11 +319,11 @@ func (l *BrowserIpfs) String() string {
 }
 
 func (l *BrowserIpfs) APIAddr() (string, error) {
-	return ipfs.GetAPIAddrFromRepo(l.dir)
+	return iptbplugins.GetAPIAddrFromRepo(l.dir)
 }
 
 func (l *BrowserIpfs) SwarmAddrs() ([]string, error) {
-	return ipfs.SwarmAddrs(l)
+	return iptbplugins.SwarmAddrs(l)
 }
 
 func (l *BrowserIpfs) Dir() string {
@@ -336,7 +336,7 @@ func (l *BrowserIpfs) PeerID() (string, error) {
 	}
 
 	var err error
-	l.peerid, err = ipfs.GetPeerID(l)
+	l.peerid, err = iptbplugins.GetPeerID(l)
 
 	if err != nil {
 		return "", err

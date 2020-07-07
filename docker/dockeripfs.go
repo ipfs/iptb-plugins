@@ -13,16 +13,16 @@ import (
 	"strings"
 	"time"
 
-	"github.com/ipfs/go-cid"
 	config "github.com/ipfs/go-ipfs-config"
 	serial "github.com/ipfs/go-ipfs-config/serialize"
+	peer "github.com/libp2p/go-libp2p-core/peer"
 	"github.com/multiformats/go-multiaddr"
 	"github.com/pkg/errors"
 	cnet "github.com/whyrusleeping/go-ctrlnet"
 
-	"github.com/ipfs/iptb-plugins"
-	"github.com/ipfs/iptb/testbed/interfaces"
-	"github.com/ipfs/iptb/util"
+	iptbplugins "github.com/ipfs/iptb-plugins"
+	testbedi "github.com/ipfs/iptb/testbed/interfaces"
+	iptbutil "github.com/ipfs/iptb/util"
 )
 
 var ErrTimeout = errors.New("timeout")
@@ -39,7 +39,7 @@ type DockerIpfs struct {
 	id          string
 	dir         string
 	repobuilder string
-	peerid      *cid.Cid
+	peerid      peer.ID
 	apiaddr     multiaddr.Multiaddr
 	swarmaddr   multiaddr.Multiaddr
 	mdns        bool
@@ -109,7 +109,7 @@ func NewNode(dir string, attrs map[string]string) (testbedi.Core, error) {
 }
 
 func GetAttrList() []string {
-	return append(ipfs.GetAttrList(), attrIfName, attrContainer)
+	return append(iptbplugins.GetAttrList(), attrIfName, attrContainer)
 }
 
 func GetAttrDesc(attr string) (string, error) {
@@ -120,15 +120,15 @@ func GetAttrDesc(attr string) (string, error) {
 		return "docker container id", nil
 	}
 
-	return ipfs.GetAttrDesc(attr)
+	return iptbplugins.GetAttrDesc(attr)
 }
 
 func GetMetricList() []string {
-	return ipfs.GetMetricList()
+	return iptbplugins.GetMetricList()
 }
 
 func GetMetricDesc(attr string) (string, error) {
-	return ipfs.GetMetricDesc(attr)
+	return iptbplugins.GetMetricDesc(attr)
 }
 
 /// Core Interface
@@ -206,7 +206,7 @@ func (l *DockerIpfs) Start(ctx context.Context, wait bool, args ...string) (test
 	}
 
 	if wait {
-		return nil, ipfs.WaitOnAPI(l)
+		return nil, iptbplugins.WaitOnAPI(l)
 	}
 
 	return nil, nil
@@ -356,11 +356,11 @@ func (l *DockerIpfs) String() string {
 }
 
 func (l *DockerIpfs) APIAddr() (string, error) {
-	return ipfs.GetAPIAddrFromRepo(l.dir)
+	return iptbplugins.GetAPIAddrFromRepo(l.dir)
 }
 
 func (l *DockerIpfs) SwarmAddrs() ([]string, error) {
-	return ipfs.SwarmAddrs(l)
+	return iptbplugins.SwarmAddrs(l)
 }
 
 func (l *DockerIpfs) Dir() string {
@@ -368,12 +368,12 @@ func (l *DockerIpfs) Dir() string {
 }
 
 func (l *DockerIpfs) PeerID() (string, error) {
-	if l.peerid != nil {
+	if l.peerid.Validate() == nil {
 		return l.peerid.String(), nil
 	}
 
 	var err error
-	l.peerid, err = ipfs.GetPeerID(l)
+	l.peerid, err = iptbplugins.GetPeerID(l)
 
 	if err != nil {
 		return "", err
@@ -393,7 +393,7 @@ func (l *DockerIpfs) GetMetricDesc(attr string) (string, error) {
 }
 
 func (l *DockerIpfs) Metric(metric string) (string, error) {
-	return ipfs.GetMetric(l, metric)
+	return iptbplugins.GetMetric(l, metric)
 }
 
 func (l *DockerIpfs) Heartbeat() (map[string]string, error) {
@@ -401,7 +401,7 @@ func (l *DockerIpfs) Heartbeat() (map[string]string, error) {
 }
 
 func (l *DockerIpfs) Events() (io.ReadCloser, error) {
-	return ipfs.ReadLogs(l)
+	return iptbplugins.ReadLogs(l)
 }
 
 func (l *DockerIpfs) Logs() (io.ReadCloser, error) {
@@ -426,7 +426,7 @@ func (l *DockerIpfs) Attr(attr string) (string, error) {
 		return l.getID()
 	}
 
-	return ipfs.GetAttr(l, attr)
+	return iptbplugins.GetAttr(l, attr)
 }
 
 func (l *DockerIpfs) SetAttr(attr string, val string) error {

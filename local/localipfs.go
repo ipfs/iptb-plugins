@@ -13,15 +13,15 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/ipfs/iptb-plugins"
-	"github.com/ipfs/iptb/testbed/interfaces"
-	"github.com/ipfs/iptb/util"
-
-	"github.com/ipfs/go-cid"
 	config "github.com/ipfs/go-ipfs-config"
 	serial "github.com/ipfs/go-ipfs-config/serialize"
+	peer "github.com/libp2p/go-libp2p-core/peer"
 	"github.com/multiformats/go-multiaddr"
 	"github.com/pkg/errors"
+
+	iptbplugins "github.com/ipfs/iptb-plugins"
+	testbedi "github.com/ipfs/iptb/testbed/interfaces"
+	iptbutil "github.com/ipfs/iptb/util"
 )
 
 var errTimeout = errors.New("timeout")
@@ -30,7 +30,7 @@ var PluginName = "localipfs"
 
 type LocalIpfs struct {
 	dir       string
-	peerid    *cid.Cid
+	peerid    peer.ID
 	apiaddr   multiaddr.Multiaddr
 	swarmaddr multiaddr.Multiaddr
 	binary    string
@@ -101,19 +101,19 @@ func NewNode(dir string, attrs map[string]string) (testbedi.Core, error) {
 }
 
 func GetAttrList() []string {
-	return ipfs.GetAttrList()
+	return iptbplugins.GetAttrList()
 }
 
 func GetAttrDesc(attr string) (string, error) {
-	return ipfs.GetAttrDesc(attr)
+	return iptbplugins.GetAttrDesc(attr)
 }
 
 func GetMetricList() []string {
-	return ipfs.GetMetricList()
+	return iptbplugins.GetMetricList()
 }
 
 func GetMetricDesc(attr string) (string, error) {
-	return ipfs.GetMetricDesc(attr)
+	return iptbplugins.GetMetricDesc(attr)
 }
 
 /// TestbedNode Interface
@@ -194,7 +194,7 @@ func (l *LocalIpfs) Start(ctx context.Context, wait bool, args ...string) (testb
 	}
 
 	if wait {
-		return nil, ipfs.WaitOnAPI(l)
+		return nil, iptbplugins.WaitOnAPI(l)
 	}
 
 	return nil, nil
@@ -366,11 +366,11 @@ func (l *LocalIpfs) String() string {
 }
 
 func (l *LocalIpfs) APIAddr() (string, error) {
-	return ipfs.GetAPIAddrFromRepo(l.dir)
+	return iptbplugins.GetAPIAddrFromRepo(l.dir)
 }
 
 func (l *LocalIpfs) SwarmAddrs() ([]string, error) {
-	return ipfs.SwarmAddrs(l)
+	return iptbplugins.SwarmAddrs(l)
 }
 
 func (l *LocalIpfs) Dir() string {
@@ -378,12 +378,12 @@ func (l *LocalIpfs) Dir() string {
 }
 
 func (l *LocalIpfs) PeerID() (string, error) {
-	if l.peerid != nil {
+	if l.peerid.Validate() == nil {
 		return l.peerid.String(), nil
 	}
 
 	var err error
-	l.peerid, err = ipfs.GetPeerID(l)
+	l.peerid, err = iptbplugins.GetPeerID(l)
 
 	if err != nil {
 		return "", err
@@ -403,7 +403,7 @@ func (l *LocalIpfs) GetMetricDesc(attr string) (string, error) {
 }
 
 func (l *LocalIpfs) Metric(metric string) (string, error) {
-	return ipfs.GetMetric(l, metric)
+	return iptbplugins.GetMetric(l, metric)
 }
 
 func (l *LocalIpfs) Heartbeat() (map[string]string, error) {
@@ -411,7 +411,7 @@ func (l *LocalIpfs) Heartbeat() (map[string]string, error) {
 }
 
 func (l *LocalIpfs) Events() (io.ReadCloser, error) {
-	return ipfs.ReadLogs(l)
+	return iptbplugins.ReadLogs(l)
 }
 
 func (l *LocalIpfs) Logs() (io.ReadCloser, error) {
@@ -429,7 +429,7 @@ func (l *LocalIpfs) GetAttrDesc(attr string) (string, error) {
 }
 
 func (l *LocalIpfs) Attr(attr string) (string, error) {
-	return ipfs.GetAttr(l, attr)
+	return iptbplugins.GetAttr(l, attr)
 }
 
 func (l *LocalIpfs) SetAttr(string, string) error {

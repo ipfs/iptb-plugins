@@ -13,16 +13,15 @@ import (
 	"strings"
 	"time"
 
-	"github.com/ipfs/go-cid"
 	config "github.com/ipfs/go-ipfs-config"
 	serial "github.com/ipfs/go-ipfs-config/serialize"
+	ipfs "github.com/ipfs/iptb-plugins"
+	testbedi "github.com/ipfs/iptb/testbed/interfaces"
+	iptbutil "github.com/ipfs/iptb/util"
+	peer "github.com/libp2p/go-libp2p-core/peer"
 	"github.com/multiformats/go-multiaddr"
 	"github.com/pkg/errors"
 	cnet "github.com/whyrusleeping/go-ctrlnet"
-
-	"github.com/ipfs/iptb-plugins"
-	"github.com/ipfs/iptb/testbed/interfaces"
-	"github.com/ipfs/iptb/util"
 )
 
 var ErrTimeout = errors.New("timeout")
@@ -39,7 +38,7 @@ type DockerIpfs struct {
 	id          string
 	dir         string
 	repobuilder string
-	peerid      *cid.Cid
+	peerid      peer.ID
 	apiaddr     multiaddr.Multiaddr
 	swarmaddr   multiaddr.Multiaddr
 	mdns        bool
@@ -368,7 +367,7 @@ func (l *DockerIpfs) Dir() string {
 }
 
 func (l *DockerIpfs) PeerID() (string, error) {
-	if l.peerid != nil {
+	if l.peerid.Validate() == nil {
 		return l.peerid.String(), nil
 	}
 

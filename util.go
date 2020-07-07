@@ -11,8 +11,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/ipfs/go-cid"
 	config "github.com/ipfs/go-ipfs-config"
+	peer "github.com/libp2p/go-libp2p-core/peer"
 	"github.com/multiformats/go-multiaddr"
 	"github.com/pkg/errors"
 
@@ -65,26 +65,26 @@ func GetMetric(l testbedi.Core, metric string) (string, error) {
 	}
 }
 
-func GetPeerID(l testbedi.Config) (*cid.Cid, error) {
-	icfg, err := l.Config()
-	if err != nil {
-		return nil, err
-	}
+// func GetPeerID(l testbedi.Config) (*cid.Cid, error) {
+// 	icfg, err := l.Config()
+// 	if err != nil {
+// 		return nil, err
+// 	}
 
-	lcfg, ok := icfg.(*config.Config)
-	if !ok {
-		return nil, fmt.Errorf("Error: GetConfig() is not an ipfs config")
-	}
+// 	lcfg, ok := icfg.(*config.Config)
+// 	if !ok {
+// 		return nil, fmt.Errorf("Error: GetConfig() is not an ipfs config")
+// 	}
 
-	pcid, err := cid.Decode(lcfg.Identity.PeerID)
-	if err != nil {
-		return nil, err
-	}
+// 	pcid, err := cid.Decode(lcfg.Identity.PeerID)
+// 	if err != nil {
+// 		return nil, err
+// 	}
 
-	return &pcid, nil
-}
+// 	return &pcid, nil
+// }
 
-func GetPeerIDString(l testbedi.Config) (string, error) {
+func GetPeerID(l testbedi.Config) (peer.ID, error) {
 	icfg, err := l.Config()
 	if err != nil {
 		return "", err
@@ -94,7 +94,13 @@ func GetPeerIDString(l testbedi.Config) (string, error) {
 	if !ok {
 		return "", fmt.Errorf("Error: GetConfig() is not an ipfs config")
 	}
-	return lcfg.Identity.PeerID, nil
+
+	id, err := peer.Decode(lcfg.Identity.PeerID)
+	if err != nil {
+		return "", err
+	}
+
+	return id, nil
 }
 
 func GetMetricList() []string {

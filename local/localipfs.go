@@ -19,6 +19,7 @@ import (
 	config "github.com/ipfs/go-ipfs-config"
 	serial "github.com/ipfs/go-ipfs-config/serialize"
 	testbedi "github.com/ipfs/iptb/testbed/interfaces"
+	peer "github.com/libp2p/go-libp2p-core/peer"
 	"github.com/multiformats/go-multiaddr"
 	"github.com/pkg/errors"
 )
@@ -29,7 +30,7 @@ var PluginName = "localipfs"
 
 type LocalIpfs struct {
 	dir       string
-	peerid    string
+	peerid    peer.ID
 	apiaddr   multiaddr.Multiaddr
 	swarmaddr multiaddr.Multiaddr
 	binary    string
@@ -377,18 +378,18 @@ func (l *LocalIpfs) Dir() string {
 }
 
 func (l *LocalIpfs) PeerID() (string, error) {
-	if l.peerid != "" {
-		return l.peerid, nil
+	if l.peerid.Validate() == nil {
+		return l.peerid.String(), nil
 	}
 
 	var err error
-	l.peerid, err = ipfs.GetPeerIDString(l)
+	l.peerid, err = ipfs.GetPeerID(l)
 
 	if err != nil {
 		return "", err
 	}
 
-	return l.peerid, nil
+	return l.peerid.String(), nil
 }
 
 /// Metric Interface

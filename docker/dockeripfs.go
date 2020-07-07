@@ -15,13 +15,14 @@ import (
 
 	config "github.com/ipfs/go-ipfs-config"
 	serial "github.com/ipfs/go-ipfs-config/serialize"
-	iptbplugins "github.com/ipfs/iptb-plugins"
-	testbedi "github.com/ipfs/iptb/testbed/interfaces"
-	iptbutil "github.com/ipfs/iptb/util"
 	peer "github.com/libp2p/go-libp2p-core/peer"
 	"github.com/multiformats/go-multiaddr"
 	"github.com/pkg/errors"
 	cnet "github.com/whyrusleeping/go-ctrlnet"
+
+	iptbplugins "github.com/ipfs/iptb-plugins"
+	testbedi "github.com/ipfs/iptb/testbed/interfaces"
+	iptbutil "github.com/ipfs/iptb/util"
 )
 
 var ErrTimeout = errors.New("timeout")

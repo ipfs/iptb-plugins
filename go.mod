@@ -10,4 +10,4 @@ require (
 	github.com/whyrusleeping/go-ctrlnet v0.0.0-20180313164037-f564fbbdaa95
 )
 
-go 1.12
+go 1.15

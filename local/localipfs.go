@@ -240,7 +240,7 @@ func (l *LocalIpfs) Stop(ctx context.Context) error {
 		return err
 	}
 
-	return fmt.Errorf("Could not stop localipfs node with pid %d", pid)
+	return fmt.Errorf("could not stop localipfs node with pid %d", pid)
 }
 
 func (l *LocalIpfs) RunCmd(ctx context.Context, stdin io.Reader, args ...string) (testbedi.Output, error) {
@@ -360,9 +360,9 @@ func (l *LocalIpfs) Shell(ctx context.Context, nodes []testbedi.Core) error {
 func (l *LocalIpfs) String() string {
 	pcid, err := l.PeerID()
 	if err != nil {
-		return fmt.Sprintf("%s", l.Type())
+		return l.Type()
 	}
-	return fmt.Sprintf("%s", pcid[0:12])
+	return pcid[0:12]
 }
 
 func (l *LocalIpfs) APIAddr() (string, error) {

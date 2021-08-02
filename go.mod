@@ -1,7 +1,6 @@
 module github.com/ipfs/iptb-plugins
 
 require (
-	github.com/ipfs/go-cid v0.0.5
 	github.com/ipfs/go-ipfs-config v0.5.3
 	github.com/ipfs/iptb v1.4.0
 	github.com/libp2p/go-libp2p-core v0.5.2

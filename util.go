@@ -73,7 +73,7 @@ func GetPeerID(l testbedi.Config) (peer.ID, error) {
 
 	lcfg, ok := icfg.(*config.Config)
 	if !ok {
-		return "", fmt.Errorf("Error: GetConfig() is not an ipfs config")
+		return "", fmt.Errorf("error: GetConfig() is not an ipfs config")
 	}
 
 	id, err := peer.Decode(lcfg.Identity.PeerID)

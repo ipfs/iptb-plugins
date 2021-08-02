@@ -64,7 +64,7 @@ func NewNode(dir string, attrs map[string]string) (testbedi.Core, error) {
 	} else {
 		jsipfspath, err := exec.LookPath("jsipfs")
 		if err != nil {
-			return nil, fmt.Errorf("No `repobuilder` provided, could not find jsipfs in path")
+			return nil, fmt.Errorf("no `repobuilder` provided, could not find jsipfs in path")
 		}
 
 		repobuilder = jsipfspath
@@ -76,7 +76,7 @@ func NewNode(dir string, attrs map[string]string) (testbedi.Core, error) {
 	if v, ok := attrs["source"]; ok {
 		source = v
 	} else {
-		return nil, fmt.Errorf("No `source` provided")
+		return nil, fmt.Errorf("no `source` provided")
 	}
 
 	return &BrowserIpfs{
@@ -105,7 +105,7 @@ func (l *BrowserIpfs) Init(ctx context.Context, agrs ...string) (testbedi.Output
 
 	lcfg, ok := icfg.(*config.Config)
 	if !ok {
-		return nil, fmt.Errorf("Error: Config() is not an ipfs config")
+		return nil, fmt.Errorf("error: Config() is not an ipfs config")
 	}
 
 	// jsipfs does not like this value being nil, so it needs to be set to an empty array
@@ -204,7 +204,7 @@ func (l *BrowserIpfs) Stop(ctx context.Context) error {
 		return err
 	}
 
-	return fmt.Errorf("Could not stop browseripfs node with pid %d", pid)
+	return fmt.Errorf("could not stop browseripfs node with pid %d", pid)
 }
 
 func (l *BrowserIpfs) RunCmd(ctx context.Context, stdin io.Reader, args ...string) (testbedi.Output, error) {
@@ -275,7 +275,7 @@ func (l *BrowserIpfs) Connect(ctx context.Context, tbn testbedi.Core) error {
 		}
 	}
 
-	return fmt.Errorf("Could not connect using any address")
+	return fmt.Errorf("could not connect using any address")
 }
 
 func (l *BrowserIpfs) Shell(ctx context.Context, nodes []testbedi.Core) error {
@@ -313,9 +313,9 @@ func (l *BrowserIpfs) Shell(ctx context.Context, nodes []testbedi.Core) error {
 func (l *BrowserIpfs) String() string {
 	pcid, err := l.PeerID()
 	if err != nil {
-		return fmt.Sprintf("%s", l.Type())
+		return l.Type()
 	}
-	return fmt.Sprintf("%s", pcid[0:12])
+	return pcid[0:12]
 }
 
 func (l *BrowserIpfs) APIAddr() (string, error) {

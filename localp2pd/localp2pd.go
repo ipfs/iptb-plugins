@@ -412,7 +412,7 @@ func (l *LocalP2pd) Type() string {
 func (l *LocalP2pd) String() string {
 	pcid, err := l.PeerID()
 	if err != nil {
-		return fmt.Sprintf("%s", l.Type())
+		return l.Type()
 	}
 	return fmt.Sprintf("%s{%s}", l.Type(), pcid[0:12])
 }

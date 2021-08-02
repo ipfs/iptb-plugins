@@ -70,7 +70,7 @@ func NewNode(dir string, attrs map[string]string) (testbedi.Core, error) {
 	} else {
 		ipfspath, err := exec.LookPath("ipfs")
 		if err != nil {
-			return nil, fmt.Errorf("No `repobuilder` provided, could not find ipfs in path")
+			return nil, fmt.Errorf("no `repobuilder` provided, could not find ipfs in path")
 		}
 
 		repobuilder = ipfspath
@@ -153,7 +153,7 @@ func (l *DockerIpfs) Init(ctx context.Context, args ...string) (testbedi.Output,
 
 	lcfg, ok := icfg.(*config.Config)
 	if !ok {
-		return nil, fmt.Errorf("Error: Config() is not an ipfs config")
+		return nil, fmt.Errorf("error: Config() is not an ipfs config")
 	}
 
 	lcfg.Bootstrap = nil
@@ -350,9 +350,9 @@ func (l *DockerIpfs) Shell(ctx context.Context, nodes []testbedi.Core) error {
 func (l *DockerIpfs) String() string {
 	pcid, err := l.PeerID()
 	if err != nil {
-		return fmt.Sprintf("%s", l.Type())
+		return l.Type()
 	}
-	return fmt.Sprintf("%s", pcid[0:12])
+	return pcid[0:12]
 }
 
 func (l *DockerIpfs) APIAddr() (string, error) {
@@ -445,11 +445,11 @@ func (l *DockerIpfs) SetAttr(attr string, val string) error {
 }
 
 func (l *DockerIpfs) StderrReader() (io.ReadCloser, error) {
-	return nil, fmt.Errorf("Not implemented")
+	return nil, fmt.Errorf("not implemented")
 }
 
 func (l *DockerIpfs) StdoutReader() (io.ReadCloser, error) {
-	return nil, fmt.Errorf("Not implemented")
+	return nil, fmt.Errorf("not implemented")
 }
 
 func (l *DockerIpfs) Config() (interface{}, error) {

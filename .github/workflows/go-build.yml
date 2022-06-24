@@ -1,0 +1,24 @@
+on: [push, pull_request]
+name: Go Build
+
+jobs:
+  unit:
+    runs-on: ubuntu-latest
+    name: All
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: recursive
+      - uses: actions/setup-go@v2
+        with:
+          go-version: "1.18.x"
+      - name: Build iptb
+        run: make iptb
+      - name: Build ipfslocal
+        run: make ipfslocal
+      - name: Build p2pdlocal
+        run: make p2pdlocal
+      - name: Build ipfsdocker
+        run: make ipfsdocker
+      - name: Build ipfsbrowser
+        run: make ipfsbrowser

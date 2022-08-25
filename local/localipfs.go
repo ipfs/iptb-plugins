@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -188,7 +187,7 @@ func (l *LocalIpfs) Start(ctx context.Context, wait bool, args ...string) (testb
 
 	pid := cmd.Process.Pid
 
-	err = ioutil.WriteFile(filepath.Join(dir, "daemon.pid"), []byte(fmt.Sprint(pid)), 0666)
+	err = os.WriteFile(filepath.Join(dir, "daemon.pid"), []byte(fmt.Sprint(pid)), 0666)
 	if err != nil {
 		return nil, err
 	}
@@ -269,12 +268,12 @@ func (l *LocalIpfs) RunCmd(ctx context.Context, stdin io.Reader, args ...string)
 		return nil, err
 	}
 
-	stderrbytes, err := ioutil.ReadAll(stderr)
+	stderrbytes, err := io.ReadAll(stderr)
 	if err != nil {
 		return nil, err
 	}
 
-	stdoutbytes, err := ioutil.ReadAll(stdout)
+	stdoutbytes, err := io.ReadAll(stdout)
 	if err != nil {
 		return nil, err
 	}
@@ -313,7 +312,7 @@ func (l *LocalIpfs) Connect(ctx context.Context, tbn testbedi.Core) error {
 	}
 
 	if output.ExitCode() != 0 {
-		out, err := ioutil.ReadAll(output.Stderr())
+		out, err := io.ReadAll(output.Stderr())
 		if err != nil {
 			return err
 		}
@@ -479,7 +478,7 @@ func (l *LocalIpfs) signalAndWait(p *os.Process, waitch <-chan struct{}, signal 
 }
 
 func (l *LocalIpfs) getPID() (int, error) {
-	b, err := ioutil.ReadFile(filepath.Join(l.dir, "daemon.pid"))
+	b, err := os.ReadFile(filepath.Join(l.dir, "daemon.pid"))
 	if err != nil {
 		return -1, err
 	}

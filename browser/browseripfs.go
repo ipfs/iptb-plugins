@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -153,7 +152,7 @@ func (l *BrowserIpfs) Start(ctx context.Context, wait bool, args ...string) (tes
 
 	pid := cmd.Process.Pid
 
-	if err = ioutil.WriteFile(filepath.Join(dir, "daemon.pid"), []byte(fmt.Sprint(pid)), 0666); err != nil {
+	if err = os.WriteFile(filepath.Join(dir, "daemon.pid"), []byte(fmt.Sprint(pid)), 0666); err != nil {
 		return nil, err
 	}
 
@@ -231,12 +230,12 @@ func (l *BrowserIpfs) RunCmd(ctx context.Context, stdin io.Reader, args ...strin
 		return nil, err
 	}
 
-	stderrbytes, err := ioutil.ReadAll(stderr)
+	stderrbytes, err := io.ReadAll(stderr)
 	if err != nil {
 		return nil, err
 	}
 
-	stdoutbytes, err := ioutil.ReadAll(stdout)
+	stdoutbytes, err := io.ReadAll(stdout)
 	if err != nil {
 		return nil, err
 	}
@@ -371,7 +370,7 @@ func (l *BrowserIpfs) signalAndWait(p *os.Process, waitch <-chan struct{}, signa
 }
 
 func (l *BrowserIpfs) getPID() (int, error) {
-	b, err := ioutil.ReadFile(filepath.Join(l.dir, "daemon.pid"))
+	b, err := os.ReadFile(filepath.Join(l.dir, "daemon.pid"))
 	if err != nil {
 		return -1, err
 	}

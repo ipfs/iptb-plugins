@@ -5,7 +5,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -71,7 +70,7 @@ func NewNode(dir string, attrs map[string]string) (testbedi.Core, error) {
 	)
 
 	pidpath := filepath.Join(dir, "p2pd.pid")
-	pidbytes, err := ioutil.ReadFile(pidpath)
+	pidbytes, err := os.ReadFile(pidpath)
 	if err != nil && !os.IsNotExist(err) {
 		return nil, err
 	}
@@ -266,7 +265,7 @@ func (l *LocalP2pd) Start(ctx context.Context, wait bool, args ...string) (testb
 
 	pid := cmd.Process.Pid
 
-	err = ioutil.WriteFile(filepath.Join(l.dir, "p2pd.pid"), []byte(fmt.Sprint(pid)), 0666)
+	err = os.WriteFile(filepath.Join(l.dir, "p2pd.pid"), []byte(fmt.Sprint(pid)), 0666)
 	if err != nil {
 		return nil, fmt.Errorf("writing libp2p daemon pid: %s", err)
 	}

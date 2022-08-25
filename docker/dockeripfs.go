@@ -5,7 +5,6 @@ import (
 	"context"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -195,7 +194,7 @@ func (l *DockerIpfs) Start(ctx context.Context, wait bool, args ...string) (test
 	l.id = string(id)
 
 	idfile := filepath.Join(l.dir, "dockerid")
-	err = ioutil.WriteFile(idfile, id, 0664)
+	err = os.WriteFile(idfile, id, 0664)
 
 	if err != nil {
 		killErr := l.killContainer()
@@ -250,12 +249,12 @@ func (l *DockerIpfs) RunCmd(ctx context.Context, stdin io.Reader, args ...string
 		return nil, err
 	}
 
-	stderrbytes, err := ioutil.ReadAll(stderr)
+	stderrbytes, err := io.ReadAll(stderr)
 	if err != nil {
 		return nil, err
 	}
 
-	stdoutbytes, err := ioutil.ReadAll(stdout)
+	stdoutbytes, err := io.ReadAll(stdout)
 	if err != nil {
 		return nil, err
 	}
@@ -305,7 +304,7 @@ func (l *DockerIpfs) Connect(ctx context.Context, n testbedi.Core) error {
 	}
 
 	if output.ExitCode() != 0 {
-		out, err := ioutil.ReadAll(output.Stderr())
+		out, err := io.ReadAll(output.Stderr())
 		if err != nil {
 			return err
 		}
@@ -473,7 +472,7 @@ func (l *DockerIpfs) getID() (string, error) {
 		return l.id, nil
 	}
 
-	b, err := ioutil.ReadFile(filepath.Join(l.dir, "dockerid"))
+	b, err := os.ReadFile(filepath.Join(l.dir, "dockerid"))
 	if err != nil {
 		return "", err
 	}
@@ -516,7 +515,7 @@ func (l *DockerIpfs) getInterfaceName() (string, error) {
 		return "", err
 	}
 
-	stdout, err := ioutil.ReadAll(out.Stdout())
+	stdout, err := io.ReadAll(out.Stdout())
 	if err != nil {
 		return "", err
 	}

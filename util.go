@@ -5,8 +5,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"net/http"
+	"os"
 	"path/filepath"
 	"strings"
 	"time"
@@ -185,7 +185,7 @@ func GetBW(l testbedi.Libp2p) (*BW, error) {
 }
 
 func GetAPIAddrFromRepo(dir string) (string, error) {
-	out, err := ioutil.ReadFile(filepath.Join(dir, "api"))
+	out, err := os.ReadFile(filepath.Join(dir, "api"))
 	return string(out), err
 }
 
@@ -200,7 +200,7 @@ func SwarmAddrs(l testbedi.Core) ([]string, error) {
 		return nil, err
 	}
 
-	bs, err := ioutil.ReadAll(output.Stdout())
+	bs, err := io.ReadAll(output.Stdout())
 	if err != nil {
 		return nil, err
 	}

@@ -14,6 +14,7 @@ import (
 	"github.com/ipfs/go-ipfs/config"
 	peer "github.com/libp2p/go-libp2p-core/peer"
 	"github.com/multiformats/go-multiaddr"
+	manet "github.com/multiformats/go-multiaddr/net"
 	"github.com/pkg/errors"
 
 	testbedi "github.com/ipfs/iptb/testbed/interfaces"
@@ -120,22 +121,17 @@ func ReadLogs(l testbedi.Libp2p) (io.ReadCloser, error) {
 		return nil, err
 	}
 
-	addr, err := multiaddr.NewMultiaddr(addrStr)
+	maddr, err := multiaddr.NewMultiaddr(addrStr)
 	if err != nil {
 		return nil, err
 	}
 
-	//TODO(tperson) ipv6
-	ip, err := addr.ValueForProtocol(multiaddr.P_IP4)
-	if err != nil {
-		return nil, err
-	}
-	pt, err := addr.ValueForProtocol(multiaddr.P_TCP)
+	addr, err := manet.ToNetAddr(maddr)
 	if err != nil {
 		return nil, err
 	}
 
-	resp, err := http.Post(fmt.Sprintf("http://%s:%s/api/v0/log/tail", ip, pt), "", nil)
+	resp, err := http.Post(fmt.Sprintf("http://%s/api/v0/log/tail", addr), "", nil)
 	if err != nil {
 		return nil, err
 	}
@@ -154,22 +150,17 @@ func GetBW(l testbedi.Libp2p) (*BW, error) {
 		return nil, err
 	}
 
-	addr, err := multiaddr.NewMultiaddr(addrStr)
+	maddr, err := multiaddr.NewMultiaddr(addrStr)
 	if err != nil {
 		return nil, err
 	}
 
-	//TODO(tperson) ipv6
-	ip, err := addr.ValueForProtocol(multiaddr.P_IP4)
-	if err != nil {
-		return nil, err
-	}
-	pt, err := addr.ValueForProtocol(multiaddr.P_TCP)
+	addr, err := manet.ToNetAddr(maddr)
 	if err != nil {
 		return nil, err
 	}
 
-	resp, err := http.Post(fmt.Sprintf("http://%s:%s/api/v0/stats/bw", ip, pt), "", nil)
+	resp, err := http.Post(fmt.Sprintf("http://%s/api/v0/stats/bw", addr), "", nil)
 	if err != nil {
 		return nil, err
 	}

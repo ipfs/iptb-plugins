@@ -11,8 +11,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/ipfs/go-ipfs/config"
-	peer "github.com/libp2p/go-libp2p-core/peer"
+	"github.com/ipfs/kubo/config"
+	peer "github.com/libp2p/go-libp2p/core/peer"
 	"github.com/multiformats/go-multiaddr"
 	manet "github.com/multiformats/go-multiaddr/net"
 	"github.com/pkg/errors"

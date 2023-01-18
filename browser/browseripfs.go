@@ -12,9 +12,9 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/ipfs/go-ipfs/config"
-	serial "github.com/ipfs/go-ipfs/config/serialize"
-	peer "github.com/libp2p/go-libp2p-core/peer"
+	"github.com/ipfs/kubo/config"
+	serial "github.com/ipfs/kubo/config/serialize"
+	peer "github.com/libp2p/go-libp2p/core/peer"
 	"github.com/pkg/errors"
 
 	iptbplugins "github.com/ipfs/iptb-plugins"

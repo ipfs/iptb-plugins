@@ -203,7 +203,7 @@ func (l *LocalP2pd) PeerID() (string, error) {
 	if err != nil {
 		return "", err
 	}
-	return peerID.Pretty(), nil
+	return peerID.String(), nil
 }
 
 // APIAddr returns the multiaddr for the api

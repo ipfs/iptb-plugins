@@ -2,6 +2,7 @@ package pluginbrowseripfs
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"io"
 	"os"
@@ -12,14 +13,12 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/ipfs/kubo/config"
-	serial "github.com/ipfs/kubo/config/serialize"
-	peer "github.com/libp2p/go-libp2p/core/peer"
-	"github.com/pkg/errors"
-
 	iptbplugins "github.com/ipfs/iptb-plugins"
 	testbedi "github.com/ipfs/iptb/testbed/interfaces"
 	iptbutil "github.com/ipfs/iptb/util"
+	"github.com/ipfs/kubo/config"
+	serial "github.com/ipfs/kubo/config/serialize"
+	peer "github.com/libp2p/go-libp2p/core/peer"
 )
 
 var errTimeout = errors.New("timeout")
@@ -63,7 +62,7 @@ func NewNode(dir string, attrs map[string]string) (testbedi.Core, error) {
 	} else {
 		jsipfspath, err := exec.LookPath("jsipfs")
 		if err != nil {
-			return nil, fmt.Errorf("no `repobuilder` provided, could not find jsipfs in path")
+			return nil, errors.New("no `repobuilder` provided, could not find jsipfs in path")
 		}
 
 		repobuilder = jsipfspath
@@ -75,7 +74,7 @@ func NewNode(dir string, attrs map[string]string) (testbedi.Core, error) {
 	if v, ok := attrs["source"]; ok {
 		source = v
 	} else {
-		return nil, fmt.Errorf("no `source` provided")
+		return nil, errors.New("no `source` provided")
 	}
 
 	return &BrowserIpfs{
@@ -104,7 +103,7 @@ func (l *BrowserIpfs) Init(ctx context.Context, agrs ...string) (testbedi.Output
 
 	lcfg, ok := icfg.(*config.Config)
 	if !ok {
-		return nil, fmt.Errorf("error: Config() is not an ipfs config")
+		return nil, errors.New("error: Config() is not an ipfs config")
 	}
 
 	// jsipfs does not like this value being nil, so it needs to be set to an empty array
@@ -246,7 +245,7 @@ func (l *BrowserIpfs) RunCmd(ctx context.Context, stdin io.Reader, args ...strin
 	switch oerr := exiterr.(type) {
 	case *exec.ExitError:
 		if ctx.Err() == context.DeadlineExceeded {
-			err = errors.Wrapf(oerr, "context deadline exceeded for command: %q", strings.Join(cmd.Args, " "))
+			err = fmt.Errorf("%w for command: %q", oerr, strings.Join(cmd.Args, " "))
 		}
 
 		exitcode = 1
@@ -274,18 +273,18 @@ func (l *BrowserIpfs) Connect(ctx context.Context, tbn testbedi.Core) error {
 		}
 	}
 
-	return fmt.Errorf("could not connect using any address")
+	return errors.New("could not connect using any address")
 }
 
 func (l *BrowserIpfs) Shell(ctx context.Context, nodes []testbedi.Core) error {
 	shell := os.Getenv("SHELL")
 	if shell == "" {
-		return fmt.Errorf("no shell found")
+		return errors.New("no shell found")
 	}
 
 	if len(os.Getenv("IPFS_PATH")) != 0 {
 		// If the users shell sets IPFS_PATH, it will just be overridden by the shell again
-		return fmt.Errorf("shell has IPFS_PATH set, please unset before trying to use iptb shell")
+		return errors.New("shell has IPFS_PATH set, please unset before trying to use iptb shell")
 	}
 
 	nenvs, err := l.env()
@@ -358,7 +357,7 @@ func (l *BrowserIpfs) Type() string {
 
 func (l *BrowserIpfs) signalAndWait(p *os.Process, waitch <-chan struct{}, signal os.Signal, t time.Duration) error {
 	if err := p.Signal(signal); err != nil {
-		return errors.Wrapf(err, "error killing daemon %s", l.dir)
+		return fmt.Errorf("error killing daemon %s: %w", l.dir, err)
 	}
 
 	select {

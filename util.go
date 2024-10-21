@@ -3,6 +3,7 @@ package ipfs
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -11,13 +12,11 @@ import (
 	"strings"
 	"time"
 
+	testbedi "github.com/ipfs/iptb/testbed/interfaces"
 	"github.com/ipfs/kubo/config"
 	peer "github.com/libp2p/go-libp2p/core/peer"
 	"github.com/multiformats/go-multiaddr"
 	manet "github.com/multiformats/go-multiaddr/net"
-	"github.com/pkg/errors"
-
-	testbedi "github.com/ipfs/iptb/testbed/interfaces"
 )
 
 const (

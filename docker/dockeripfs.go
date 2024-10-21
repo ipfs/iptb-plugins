@@ -3,6 +3,7 @@ package plugindockeripfs
 import (
 	"bytes"
 	"context"
+	"errors"
 	"fmt"
 	"io"
 	"os"
@@ -16,7 +17,6 @@ import (
 	serial "github.com/ipfs/kubo/config/serialize"
 	peer "github.com/libp2p/go-libp2p/core/peer"
 	"github.com/multiformats/go-multiaddr"
-	"github.com/pkg/errors"
 	cnet "github.com/whyrusleeping/go-ctrlnet"
 
 	iptbplugins "github.com/ipfs/iptb-plugins"
@@ -69,7 +69,7 @@ func NewNode(dir string, attrs map[string]string) (testbedi.Core, error) {
 	} else {
 		ipfspath, err := exec.LookPath("ipfs")
 		if err != nil {
-			return nil, fmt.Errorf("no `repobuilder` provided, could not find ipfs in path")
+			return nil, errors.New("no `repobuilder` provided, could not find ipfs in path")
 		}
 
 		repobuilder = ipfspath
@@ -152,7 +152,7 @@ func (l *DockerIpfs) Init(ctx context.Context, args ...string) (testbedi.Output,
 
 	lcfg, ok := icfg.(*config.Config)
 	if !ok {
-		return nil, fmt.Errorf("error: Config() is not an ipfs config")
+		return nil, errors.New("error: Config() is not an ipfs config")
 	}
 
 	lcfg.Bootstrap = nil
@@ -176,7 +176,7 @@ func (l *DockerIpfs) Start(ctx context.Context, wait bool, args ...string) (test
 	}
 
 	if alive {
-		return nil, fmt.Errorf("node is already running")
+		return nil, errors.New("node is already running")
 	}
 
 	fargs := []string{"run", "-d", "-v", l.dir + ":/data/ipfs", l.image}
@@ -269,7 +269,7 @@ func (l *DockerIpfs) RunCmd(ctx context.Context, stdin io.Reader, args ...string
 	switch oerr := exiterr.(type) {
 	case *exec.ExitError:
 		if ctx.Err() == context.DeadlineExceeded {
-			err = errors.Wrapf(oerr, "context deadline exceeded for command: %q", strings.Join(cmd.Args, " "))
+			err = fmt.Errorf("context deadline exceeded for command: %q: %w", strings.Join(cmd.Args, " "), oerr)
 		}
 
 		exitcode = 1
@@ -309,7 +309,7 @@ func (l *DockerIpfs) Connect(ctx context.Context, n testbedi.Core) error {
 			return err
 		}
 
-		return fmt.Errorf("%s", string(out))
+		return errors.New(string(out))
 	}
 
 	return nil
@@ -404,7 +404,7 @@ func (l *DockerIpfs) Events() (io.ReadCloser, error) {
 }
 
 func (l *DockerIpfs) Logs() (io.ReadCloser, error) {
-	return nil, fmt.Errorf("not implemented")
+	return nil, errors.New("not implemented")
 }
 
 // Attribute Interface
@@ -444,11 +444,11 @@ func (l *DockerIpfs) SetAttr(attr string, val string) error {
 }
 
 func (l *DockerIpfs) StderrReader() (io.ReadCloser, error) {
-	return nil, fmt.Errorf("not implemented")
+	return nil, errors.New("not implemented")
 }
 
 func (l *DockerIpfs) StdoutReader() (io.ReadCloser, error) {
-	return nil, fmt.Errorf("not implemented")
+	return nil, errors.New("not implemented")
 }
 
 func (l *DockerIpfs) Config() (interface{}, error) {
@@ -530,7 +530,7 @@ func (l *DockerIpfs) getInterfaceName() (string, error) {
 	}
 
 	if cside == "" {
-		return "", fmt.Errorf("container-side interface not found")
+		return "", errors.New("container-side interface not found")
 	}
 
 	localout, err := exec.Command("ip", "link").CombinedOutput()
@@ -544,7 +544,7 @@ func (l *DockerIpfs) getInterfaceName() (string, error) {
 		}
 	}
 
-	return "", fmt.Errorf("could not determine interface")
+	return "", errors.New("could not determine interface")
 }
 
 func (l *DockerIpfs) setLatency(val string) error {

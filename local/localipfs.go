@@ -2,6 +2,7 @@ package pluginlocalipfs
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"io"
 	"os"
@@ -12,16 +13,13 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/ipfs/kubo/config"
-	serial "github.com/ipfs/kubo/config/serialize"
-
-	peer "github.com/libp2p/go-libp2p/core/peer"
-	"github.com/multiformats/go-multiaddr"
-	"github.com/pkg/errors"
-
 	iptbplugins "github.com/ipfs/iptb-plugins"
 	testbedi "github.com/ipfs/iptb/testbed/interfaces"
 	iptbutil "github.com/ipfs/iptb/util"
+	"github.com/ipfs/kubo/config"
+	serial "github.com/ipfs/kubo/config/serialize"
+	peer "github.com/libp2p/go-libp2p/core/peer"
+	"github.com/multiformats/go-multiaddr"
 )
 
 var errTimeout = errors.New("timeout")
@@ -153,7 +151,7 @@ func (l *LocalIpfs) Start(ctx context.Context, wait bool, args ...string) (testb
 	}
 
 	if alive {
-		return nil, fmt.Errorf("node is already running")
+		return nil, errors.New("node is already running")
 	}
 
 	dir := l.dir
@@ -289,7 +287,7 @@ func (l *LocalIpfs) RunCmd(ctx context.Context, stdin io.Reader, args ...string)
 	switch oerr := exiterr.(type) {
 	case *exec.ExitError:
 		if ctx.Err() == context.DeadlineExceeded {
-			err = errors.Wrapf(oerr, "context deadline exceeded for command: %q", strings.Join(cmd.Args, " "))
+			err = fmt.Errorf("%w for command: %q", oerr, strings.Join(cmd.Args, " "))
 		}
 
 		exitcode = 1
@@ -327,12 +325,12 @@ func (l *LocalIpfs) Connect(ctx context.Context, tbn testbedi.Core) error {
 func (l *LocalIpfs) Shell(ctx context.Context, nodes []testbedi.Core) error {
 	shell := os.Getenv("SHELL")
 	if shell == "" {
-		return fmt.Errorf("no shell found")
+		return errors.New("no shell found")
 	}
 
 	if len(os.Getenv("IPFS_PATH")) != 0 {
 		// If the users shell sets IPFS_PATH, it will just be overridden by the shell again
-		return fmt.Errorf("shell has IPFS_PATH set, please unset before trying to use iptb shell")
+		return errors.New("shell has IPFS_PATH set, please unset before trying to use iptb shell")
 	}
 
 	nenvs, err := l.env()
@@ -415,7 +413,7 @@ func (l *LocalIpfs) Events() (io.ReadCloser, error) {
 }
 
 func (l *LocalIpfs) Logs() (io.ReadCloser, error) {
-	return nil, fmt.Errorf("not implemented")
+	return nil, errors.New("not implemented")
 }
 
 // Attribute Interface
@@ -433,7 +431,7 @@ func (l *LocalIpfs) Attr(attr string) (string, error) {
 }
 
 func (l *LocalIpfs) SetAttr(string, string) error {
-	return fmt.Errorf("no attribute to set")
+	return errors.New("no attribute to set")
 }
 
 func (l *LocalIpfs) StderrReader() (io.ReadCloser, error) {
